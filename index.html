@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html ng-app="myApp">
+  <head>
+    <title>AngularJS Form</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.9/angular.min.js"></script>
+  </head>
+  <body ng-controller="myController">
+    <h1>Enter Data</h1>
+
+    <form ng-submit="submitData()">
+      <label for="fieldName">Field Name:</label>
+      <input
+        type="text"
+        id="fieldName"
+        ng-model="fieldData.name"
+        required
+      /><br />
+
+      <label for="fieldValue">Field Value:</label>
+      <input
+        type="text"
+        id="fieldValue"
+        ng-model="fieldData.pass"
+        required
+      /><br />
+
+      <button type="submit">Submit</button>
+    </form>
+    <h2>Data Table</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Value</th>
+          <th>update</th>
+          <th>delete</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="data in datalist">
+          <td>{{ data.name }}</td>
+          <td>{{ data.pass }}</td>
+          <th> <a href="#" ng-click="editData(data)">Edit</a></th>
+          <th><a href="#" ng-click="delRecord(this.data._id)">Delete</th>
+        </tr>
+      </tbody>
+    </table>
+    <div ng-show="response">{{ response }}</div>
+
+    <script>
+      var app = angular.module("myApp", []);
+      app.controller("myController", function ($scope, $http) {
+        $scope.fieldData = {};
+        $scope.datalist = [];
+        $scope.isEdit = false;
+      $scope.editData = {};
+
+
+
+
+
+
+        $scope.getdata = function () {
+          $http
+            .get("http://localhost:4444/show")
+            .then((res) => {
+              $scope.datalist = res.data;
+              console.log(res.data);
+            })
+            .catch(() => {
+              console.log("err");
+            });
+        };
+$scope.getdata();
+      
+$scope.submitData = function () {
+          $http.post("http://localhost:4444/data", $scope.fieldData).then(
+            function (response) {
+              console.log(response.data);
+              $scope.response = "Data saved: " + JSON.stringify(response.data);
+            },
+            function (error) {
+              $scope.response = "Error: " + JSON.stringify(error);
+            }
+          );
+        };
+
+
+        $scope.delRecord = (id) => {
+        $http.delete(`http://localhost:4444/data/${id}`).then((res) => {
+            $scope.getdata()
+        });
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+      });
+    </script>
+  </body>
+</html>
